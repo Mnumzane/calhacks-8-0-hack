@@ -469,7 +469,7 @@ function App(props) {
               }}
               to="/liquidity"
             >
-              Liquidity Provider
+              Provide Liquidity
             </Link>
           </Menu.Item>
           <Menu.Item key="/hints">
@@ -524,14 +524,6 @@ function App(props) {
 
             <Contract
               name="YourContract"
-              signer={userSigner}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-              contractConfig={contractConfig}
-            />
-            <Contract
-              name="LiquidityProvisionContract"
               signer={userSigner}
               provider={localProvider}
               address={address}
