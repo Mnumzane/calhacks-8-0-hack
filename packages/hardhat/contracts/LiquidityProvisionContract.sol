@@ -5,10 +5,10 @@ import "hardhat/console.sol";
 
 //import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
 
-contract LiquidityProvision {
+contract LiquidityProvisionContract {
     //event SetPurpose(address sender, string purpose);
 
-    string public purpose = "Building Unstoppable Apps!!!";
+    string public purpose = "Automatic LP adjustement";
 
     constructor() {
         // what should we do on deploy?

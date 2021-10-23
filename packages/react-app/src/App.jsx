@@ -530,10 +530,18 @@ function App(props) {
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
             />
+            <Contract
+              name="LiquidityProvisionContract"
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
           </Route>
           <Route exact path="/liquidity">
             <Contract
-              name="Liquidity Provision"
+              name="LiquidityProvisionContract"
               signer={userSigner}
               provider={localProvider}
               address={address}
