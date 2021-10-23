@@ -459,7 +459,17 @@ function App(props) {
               }}
               to="/"
             >
-              YourContract
+              Your Contract
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/liquidity">
+            <Link
+              onClick={() => {
+                setRoute("/liquidity");
+              }}
+              to="/liquidity"
+            >
+              Provide Liquidity
             </Link>
           </Menu.Item>
           <Menu.Item key="/hints">
@@ -514,6 +524,16 @@ function App(props) {
 
             <Contract
               name="YourContract"
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
+          </Route>
+          <Route exact path="/liquidity">
+            <Contract
+              name="LiquidityProvisionContract"
               signer={userSigner}
               provider={localProvider}
               address={address}
