@@ -39,36 +39,36 @@ export default function ExampleUI({
         <h4>strategy: {strategy}</h4>
         <Divider />
         <div style={{ margin: 8 }}>
-          <Input
-            onChange={e => {
-              setNewStrategy(e.target.value);
-            }}
-          />
           <Button
-            style={{ marginTop: 8 }}
-            onClick={async () => {
+            onClick={() => {
               /* look how you call setStrategy on your contract: */
-              /* notice how you pass a call back for tx updates too */
-              const result = tx(writeContracts.LiquidityProvisionContract.setStrategy(newStrategy), update => {
-                console.log("📡 Transaction Update:", update);
-                if (update && (update.status === "confirmed" || update.status === 1)) {
-                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                  console.log(
-                    " ⛽️ " +
-                      update.gasUsed +
-                      "/" +
-                      (update.gasLimit || update.gas) +
-                      " @ " +
-                      parseFloat(update.gasPrice) / 1000000000 +
-                      " gwei",
-                  );
-                }
-              });
-              console.log("awaiting metamask/web3 confirm result...", result);
-              console.log(await result);
+              setNewStrategy("fixed strategy");
+              tx(writeContracts.LiquidityProvisionContract.setStrategy("fixed strategy"));
             }}
           >
-            Set Strategy!
+            Set Strategy to &quot;fixed strategy&quot;
+          </Button>
+        </div>
+        <div style={{ margin: 8 }}>
+          <Button
+            onClick={() => {
+              /* look how you call setStrategy on your contract: */
+              setNewStrategy("uniform reset strategy");
+              tx(writeContracts.LiquidityProvisionContract.setStrategy("uniform reset strategy"));
+            }}
+          >
+            Set Strategy to &quot;uniform reset strategy&quot;
+          </Button>
+        </div>
+        <div style={{ margin: 8 }}>
+          <Button
+            onClick={() => {
+              /* look how you call setStrategy on your contract: */
+              setNewStrategy("proportional reset strategy");
+              tx(writeContracts.LiquidityProvisionContract.setStrategy("proportional reset strategy"));
+            }}
+          >
+            Set Strategy to &quot;proportional reset strategy&quot;
           </Button>
         </div>
         <Divider />
@@ -170,17 +170,7 @@ export default function ExampleUI({
           ))}
         </Select>
         <Divider />
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* look how you call setStrategy on your contract: */
-              setNewStrategy("fixed strategy");
-              tx(writeContracts.LiquidityProvisionContract.setStrategy("fixed strategy"));
-            }}
-          >
-            Set Strategy to &quot;fixed strategy&quot;
-          </Button>
-        </div>
+        
         <div style={{ margin: 8 }}>
           <Button
             onClick={() => {
@@ -196,38 +186,6 @@ export default function ExampleUI({
             }}
           >
             Send Value
-          </Button>
-        </div>
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* look how we call setStrategy AND send some value along */
-              tx(
-                writeContracts.LiquidityProvisionContract.setStrategy("💵 Paying for this one!", {
-                  value: utils.parseEther("0.001"),
-                }),
-              );
-              /* this will fail until you make the setStrategy function payable */
-            }}
-          >
-            Set Strategy With Value
-          </Button>
-        </div>
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* you can also just craft a transaction and send it to the tx() transactor */
-              tx({
-                to: writeContracts.LiquidityProvisionContract.address,
-                value: utils.parseEther("0.001"),
-                data: writeContracts.LiquidityProvisionContract.interface.encodeFunctionData("setStrategy(string)", [
-                  "🤓 Whoa so 1337!",
-                ]),
-              });
-              /* this should throw an error about "no fallback nor receive function" until you add it */
-            }}
-          >
-            Another Example
           </Button>
         </div>
       </div>
