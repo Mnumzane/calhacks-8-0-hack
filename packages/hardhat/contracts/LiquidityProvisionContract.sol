@@ -6,7 +6,10 @@ import "hardhat/console.sol";
 // import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
 
 contract LiquidityProvisionContract {
-    //event SetPurpose(address sender, string purpose);
+    event SetToken1(address sender, string token1);
+    event SetToken2(address sender, string token2);
+    event SetStrategy(address sender, string strategy);
+    event Error(string error_msg);
 
     mapping(string => string) strategies;
     string public token1 = "ETH";
@@ -28,20 +31,20 @@ contract LiquidityProvisionContract {
 
     function setToken1(string memory newToken1) public {
         token1 = newToken1;
-        console.log(msg.sender, "set token1 to", token1);
+        emit SetToken1(msg.sender, token1);
     }
 
     function setToken2(string memory newToken2) public {
         token2 = newToken2;
-        console.log(msg.sender, "set token2 to", token2);
+        emit SetToken2(msg.sender, token2);
     }
 
     function setStrategy(string memory newStrategy) public {
         if (bytes(strategies[newStrategy]).length != 0) {
             strategy = newStrategy;
-            console.log(msg.sender, "set strategy to", token2);
+            emit SetStrategy(msg.sender, strategy);
         } else {
-            console.log(msg.sender, "invalid strategy");
+            emit Error("Invalid strategy.");
         }
     }
 }
