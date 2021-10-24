@@ -29,6 +29,10 @@ contract LiquidityProvisionContract {
         ] = "Allocate liquidity proportionally to the probability of each bin in the that has 50% mass of the next-price distribution.";
     }
 
+    receive() external payable {
+        console.log("We got da money:",msg.value); 
+    }
+
     function setToken1(string memory newToken1) public {
         token1 = newToken1;
         emit SetToken1(msg.sender, token1);

@@ -185,7 +185,7 @@ export default function ExampleUI({
               /* this should throw an error about "no fallback nor receive function" until you add it */
             }}
           >
-            Send Value
+            Pool
           </Button>
         </div>
       </div>
