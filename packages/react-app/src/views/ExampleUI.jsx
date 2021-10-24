@@ -1,12 +1,18 @@
 import { SyncOutlined } from "@ant-design/icons";
+import { Select } from "antd";
 import { utils } from "ethers";
 import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin, Switch } from "antd";
 import React, { useState } from "react";
 import { Address, Balance } from "../components";
+import { useTokenList } from "eth-hooks/dapps/dex";
 
 export default function ExampleUI({
-  purpose,
-  setPurposeEvents,
+  token1,
+  token2,
+  strategy,
+  setStrategyEvents,
+  setToken1Events,
+  setToken2Events,
   address,
   mainnetProvider,
   localProvider,
@@ -16,7 +22,12 @@ export default function ExampleUI({
   readContracts,
   writeContracts,
 }) {
-  const [newPurpose, setNewPurpose] = useState("loading...");
+  const [newStrategy, setNewStrategy] = useState("loading...");
+  const [selectedToken1, setSelectedToken1] = useState("Pick a token!");
+  const [selectedToken2, setSelectedToken2] = useState("Pick a token!");
+  const listOfTokens = useTokenList(
+    "https://raw.githubusercontent.com/SetProtocol/uniswap-tokenlist/main/set.tokenlist.json",
+  );
 
   return (
     <div>
@@ -24,40 +35,40 @@ export default function ExampleUI({
         ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
       */}
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
-        <h2>Example UI:</h2>
-        <h4>purpose: {purpose}</h4>
+        <h2>Liquidity Manager UI</h2>
+        <h4>strategy: {strategy}</h4>
         <Divider />
         <div style={{ margin: 8 }}>
-          <Input
-            onChange={e => {
-              setNewPurpose(e.target.value);
-            }}
-          />
           <Button
-            style={{ marginTop: 8 }}
-            onClick={async () => {
-              /* look how you call setPurpose on your contract: */
-              /* notice how you pass a call back for tx updates too */
-              const result = tx(writeContracts.YourContract.setPurpose(newPurpose), update => {
-                console.log("📡 Transaction Update:", update);
-                if (update && (update.status === "confirmed" || update.status === 1)) {
-                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                  console.log(
-                    " ⛽️ " +
-                      update.gasUsed +
-                      "/" +
-                      (update.gasLimit || update.gas) +
-                      " @ " +
-                      parseFloat(update.gasPrice) / 1000000000 +
-                      " gwei",
-                  );
-                }
-              });
-              console.log("awaiting metamask/web3 confirm result...", result);
-              console.log(await result);
+            onClick={() => {
+              /* look how you call setStrategy on your contract: */
+              setNewStrategy("fixed strategy");
+              tx(writeContracts.LiquidityProvisionContract.setStrategy("fixed strategy"));
             }}
           >
-            Set Purpose!
+            Set Strategy to &quot;fixed strategy&quot;
+          </Button>
+        </div>
+        <div style={{ margin: 8 }}>
+          <Button
+            onClick={() => {
+              /* look how you call setStrategy on your contract: */
+              setNewStrategy("uniform reset strategy");
+              tx(writeContracts.LiquidityProvisionContract.setStrategy("uniform reset strategy"));
+            }}
+          >
+            Set Strategy to &quot;uniform reset strategy&quot;
+          </Button>
+        </div>
+        <div style={{ margin: 8 }}>
+          <Button
+            onClick={() => {
+              /* look how you call setStrategy on your contract: */
+              setNewStrategy("proportional reset strategy");
+              tx(writeContracts.LiquidityProvisionContract.setStrategy("proportional reset strategy"));
+            }}
+          >
+            Set Strategy to &quot;proportional reset strategy&quot;
           </Button>
         </div>
         <Divider />
@@ -76,29 +87,90 @@ export default function ExampleUI({
         <div>OR</div>
         <Balance address={address} provider={localProvider} price={price} />
         <Divider />
-        <div>🐳 Example Whale Balance:</div>
-        <Balance balance={utils.parseEther("1000")} provider={localProvider} price={price} />
-        <Divider />
-        {/* use utils.formatEther to display a BigNumber: */}
-        <h2>Your Balance: {yourLocalBalance ? utils.formatEther(yourLocalBalance) : "..."}</h2>
-        <Divider />
         Your Contract Address:
         <Address
-          address={readContracts && readContracts.YourContract ? readContracts.YourContract.address : null}
+          address={
+            readContracts && readContracts.LiquidityProvisionContract
+              ? readContracts.LiquidityProvisionContract.address
+              : null
+          }
           ensProvider={mainnetProvider}
           fontSize={16}
         />
         <Divider />
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* look how you call setPurpose on your contract: */
-              tx(writeContracts.YourContract.setPurpose("🍻 Cheers"));
-            }}
-          >
-            Set Purpose to &quot;🍻 Cheers&quot;
-          </Button>
-        </div>
+        <Select
+          showSearch
+          value={selectedToken1}
+          onChange={async value => {
+            if (value === selectedToken2) {
+              return;
+            }
+            const result = tx(writeContracts.LiquidityProvisionContract.setToken1(value), update => {
+              console.log("📡 Transaction Update:", update);
+              if (update && (update.status === "confirmed" || update.status === 1)) {
+                console.log(" 🍾 Transaction " + update.hash + " finished!");
+                console.log(
+                  " ⛽️ " +
+                    update.gasUsed +
+                    "/" +
+                    (update.gasLimit || update.gas) +
+                    " @ " +
+                    parseFloat(update.gasPrice) / 1000000000 +
+                    " gwei",
+                );
+              }
+            });
+            console.log("awaiting metamask/web3 confirm result...", result);
+            console.log(await result);
+            return setSelectedToken1(value);
+          }}
+          filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+          optionFilterProp="children"
+        >
+          {listOfTokens.map(token => (
+            <Option key={token.symbol} value={token.symbol}>
+              {token.symbol}
+            </Option>
+          ))}
+        </Select>
+        <Divider />
+        <Select
+          showSearch
+          value={selectedToken2}
+          onChange={async value => {
+            if (value === selectedToken1) {
+              return;
+            }
+            const result = tx(writeContracts.LiquidityProvisionContract.setToken2(value), update => {
+              console.log("📡 Transaction Update:", update);
+              if (update && (update.status === "confirmed" || update.status === 1)) {
+                console.log(" 🍾 Transaction " + update.hash + " finished!");
+                console.log(
+                  " ⛽️ " +
+                    update.gasUsed +
+                    "/" +
+                    (update.gasLimit || update.gas) +
+                    " @ " +
+                    parseFloat(update.gasPrice) / 1000000000 +
+                    " gwei",
+                );
+              }
+            });
+            console.log("awaiting metamask/web3 confirm result...", result);
+            console.log(await result);
+            return setSelectedToken2(value);
+          }}
+          filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+          optionFilterProp="children"
+        >
+          {listOfTokens.map(token => (
+            <Option key={token.symbol} value={token.symbol}>
+              {token.symbol}
+            </Option>
+          ))}
+        </Select>
+        <Divider />
+        
         <div style={{ margin: 8 }}>
           <Button
             onClick={() => {
@@ -107,7 +179,7 @@ export default function ExampleUI({
               here we are sending value straight to the contract's address:
             */
               tx({
-                to: writeContracts.YourContract.address,
+                to: writeContracts.LiquidityProvisionContract.address,
                 value: utils.parseEther("0.001"),
               });
               /* this should throw an error about "no fallback nor receive function" until you add it */
@@ -116,49 +188,17 @@ export default function ExampleUI({
             Send Value
           </Button>
         </div>
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* look how we call setPurpose AND send some value along */
-              tx(
-                writeContracts.YourContract.setPurpose("💵 Paying for this one!", {
-                  value: utils.parseEther("0.001"),
-                }),
-              );
-              /* this will fail until you make the setPurpose function payable */
-            }}
-          >
-            Set Purpose With Value
-          </Button>
-        </div>
-        <div style={{ margin: 8 }}>
-          <Button
-            onClick={() => {
-              /* you can also just craft a transaction and send it to the tx() transactor */
-              tx({
-                to: writeContracts.YourContract.address,
-                value: utils.parseEther("0.001"),
-                data: writeContracts.YourContract.interface.encodeFunctionData("setPurpose(string)", [
-                  "🤓 Whoa so 1337!",
-                ]),
-              });
-              /* this should throw an error about "no fallback nor receive function" until you add it */
-            }}
-          >
-            Another Example
-          </Button>
-        </div>
       </div>
 
       {/*
         📑 Maybe display a list of events?
-          (uncomment the event and emit line in YourContract.sol! )
+          (uncomment the event and emit line in LiquidityProvisionContract.sol! )
       */}
       <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
         <h2>Events:</h2>
         <List
           bordered
-          dataSource={setPurposeEvents}
+          dataSource={setStrategyEvents.concat(setToken1Events).concat(setToken2Events)}
           renderItem={item => {
             return (
               <List.Item key={item.blockNumber + "_" + item.args.sender + "_" + item.args.purpose}>
@@ -170,7 +210,7 @@ export default function ExampleUI({
         />
       </div>
 
-      <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 256 }}>
+      {/* <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 256 }}>
         <Card>
           Check out all the{" "}
           <a
@@ -222,7 +262,7 @@ export default function ExampleUI({
             <Spin />
           </div>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -250,10 +250,21 @@ function App(props) {
   ]);
 
   // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+  const purpose = useContractReader(readContracts, "LiquidityProvisionContract", "purpose");
+  const strategy = useContractReader(readContracts, "LiquidityProvisionContract", "strategy");
+  const token1 = useContractReader(readContracts, "LiquidityProvisionContract", "token1");
+  const token2 = useContractReader(readContracts, "LiquidityProvisionContract", "token2");
 
   // 📟 Listen for broadcast events
-  const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
+  const setToken1Events = useEventListener(readContracts, "LiquidityProvisionContract", "SetToken1", localProvider, 1);
+  const setToken2Events = useEventListener(readContracts, "LiquidityProvisionContract", "SetToken2", localProvider, 1);
+  const setStrategyEvents = useEventListener(
+    readContracts,
+    "LiquidityProvisionContract",
+    "SetStrategy",
+    localProvider,
+    1,
+  );
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -561,7 +572,12 @@ function App(props) {
               writeContracts={writeContracts}
               readContracts={readContracts}
               purpose={purpose}
-              setPurposeEvents={setPurposeEvents}
+              token1={token1}
+              token2={token2}
+              strategy={strategy}
+              setStrategyEvents={setStrategyEvents}
+              setToken1Events={setToken1Events}
+              setToken2Events={setToken2Events}
             />
           </Route>
           <Route path="/mainnetdai">
