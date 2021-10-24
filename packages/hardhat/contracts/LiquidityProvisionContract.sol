@@ -2,13 +2,13 @@ pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
 
-contract LiquidityProvisionContract is Ownable {
+// import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+
+contract LiquidityProvisionContract {
     //event SetPurpose(address sender, string purpose);
 
-    mapping(string => string) public strategies;
-
+    mapping(string => string) strategies;
     string public token1 = "ETH";
     string public token2 = "DAI";
     string public strategy = "fixed strategy";
@@ -26,21 +26,22 @@ contract LiquidityProvisionContract is Ownable {
         ] = "Allocate liquidity proportionally to the probability of each bin in the that has 50% mass of the next-price distribution.";
     }
 
-    function setPurpose(string memory newPurpose) public {
-        purpose = newPurpose;
-        console.log(msg.sender, "set purpose to", purpose);
-        //emit SetPurpose(msg.sender, purpose);
-    }
-
     function setToken1(string memory newToken1) public {
         token1 = newToken1;
         console.log(msg.sender, "set token1 to", token1);
-        //emit SetPurpose(msg.sender, purpose);
     }
 
     function setToken2(string memory newToken2) public {
         token2 = newToken2;
-        console.log(msg.sender, "set token1 to", token2);
-        //emit SetPurpose(msg.sender, purpose);
+        console.log(msg.sender, "set token2 to", token2);
+    }
+
+    function setStrategy(string memory newStrategy) public {
+        if (bytes(strategies[newStrategy]).length != 0) {
+            strategy = newStrategy;
+            console.log(msg.sender, "set strategy to", token2);
+        } else {
+            console.log(msg.sender, "invalid strategy");
+        }
     }
 }
